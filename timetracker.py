@@ -5,13 +5,14 @@ class TimeTracker:
     def __init__(self):
         self.open_create_file()
         self.start_logging()
+        self.file = None
 
     def open_create_file(self):
-        file = open("log.txt")
+        self.file = open("log.txt", "a")
 
     def start_logging(self):
         for proc in psutil.process_iter():
-            print(proc.name())
+            self.file.write(proc.name())
 
 
 if __name__ == '__main__':
