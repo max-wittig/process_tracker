@@ -3,6 +3,7 @@ import json
 import time
 import threading
 
+
 class JsonWriter:
     def __init__(self):
         self.file = None
@@ -64,7 +65,7 @@ if __name__ == '__main__':
     json_writer = JsonWriter()
     thread = threading.Thread(target=time_tracker.start_logging, args=(1, ))
     thread.start()
-    time.sleep(20)
+    time.sleep(5)
     time_tracker.stop_logging()
     time_tracker.write_process_list()
 
