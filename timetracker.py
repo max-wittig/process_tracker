@@ -55,10 +55,11 @@ if __name__ == '__main__':
     time_tracker = TimeTracker()
     json_writer = JsonWriter()
 
-for i in range(0, 1000):
-    time_tracker.start_logging()
-    time.sleep(1)
-    time_tracker.write_process_list()
+for i in range(0, 10):
+    if time_tracker is not None:
+        time_tracker.start_logging()
+        time.sleep(1)
+time_tracker.write_process_list()
 
 
 
