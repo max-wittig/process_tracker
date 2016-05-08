@@ -45,7 +45,7 @@ class TimeTracker:
         while self.running:
             for proc in psutil.process_iter():
                 if str(proc.name()).strip(" ") in processes_to_track:
-                    process_object = {"name": proc.name(), "count": 1}
+                    process_object = {"name": proc.name(), "count": 1, "startTime": time.time()}
                     if self.is_object_already_in_process_list(process_object):
                         self.process_list[self.get_object_position_with_key(process_object["name"])]["count"] += 1
                     else:
