@@ -11,10 +11,6 @@ class JsonReaderWriter:
         self.fileContent = ""
         self.process_list = []
 
-    def create_json_object(self, process_object_list):
-        for process in process_object_list:
-            self.process_list.append(process.process_name)
-
     def open_create_file(self):
         self.file = open(self.filename, "w")
         """self.fileContent = self.file.read()"""
@@ -22,7 +18,10 @@ class JsonReaderWriter:
     def write_process_list_to_file(self, process_object_list):
         self.open_create_file()
         if self.file is not None:
-            json.dump(process_object_list, self.file, indent=2)
+            for process in process_object_list:
+                """get process_json from object and add it to list, which can be printed"""
+                self.process_list.append(process.get_json_object())
+            json.dump(self.process_list, self.file, indent=2)
 
     def get_existing_process_list(self):
         if self.fileContent is not None:
@@ -35,6 +34,11 @@ class Process:
     def __init__(self, process_name):
         self.process_name = process_name
         self.task_list = []
+        self.start_time = time.time()
+        self.end_time = None
+
+    def set_end_time(self):
+        self.end_time = time.time()
 
     def add_task(self, task):
         self.task_list.append(task)
@@ -45,6 +49,17 @@ class Process:
     def get_process_name(self):
         return self.process_name
 
+    def get_json_object(self):
+        process = {
+            "process_name": self.process_name,
+            "startTime": self.start_time,
+            "endTime": self.end_time
+        }
+        return process
+
+    def get_run_time(self):
+        return self.end_time-self.start_time
+
 
 class Task:
     def __init__(self, start_time, end_time):
@@ -54,7 +69,6 @@ class Task:
 
 class TimeTracker:
     def __init__(self, processes_to_track):
-        self.process_list = []
         self.json_reader_writer = JsonReaderWriter()
         self.running = False
         self.process_object_list = []
@@ -62,15 +76,15 @@ class TimeTracker:
 
     def get_object_position_with_key(self, key):
         counter = 0
-        for proc in self.process_list:
-            if proc["name"] in str(key):
+        for process in self.process_object_list:
+            if str(key) is process.get_process_name():
                 return counter
             counter += 1
 
-    def is_object_already_in_process_list(self, object_to_check):
+    def is_name_already_in_process_list(self, process_name):
         is_contained = False
-        for thing in self.process_list:
-            if str(thing["name"]) in str(object_to_check["name"]):
+        for current_process in self.process_object_list:
+            if str(process_name) == str(current_process.get_process_name()):
                 is_contained = True
         return is_contained
 
@@ -79,15 +93,29 @@ class TimeTracker:
         self.running = True
 
         while self.running:
+            """start initial process_list"""
             for proc in psutil.process_iter():
                 process_name = proc.name()
+                print(proc.pid)
                 current_process = Process(process_name)
-                if current_process not in self.process_object_list:
+                if self.is_name_already_in_process_list(process_name):
+                    """process already in list"""
+                else:
+                    """Process is not in process_object_list"""
                     """add process to list"""
                     self.process_object_list.append(current_process)
 
-        time.sleep(delay)
-        print(self.process_object_list)
+            """give process end_time if not running anymore"""
+            for list_process in self.process_object_list:
+                is_contained = False
+                for running_process in psutil.process_iter():
+                    if str(running_process.name()) == str(list_process.get_process_name()):
+                        is_contained = True
+                if is_contained is False:
+                    """process no longer running, set endTime"""
+                    list_process.set_end_time()
+
+            time.sleep(delay)
 
     def stop_logging(self):
         print("Logging stopped")
