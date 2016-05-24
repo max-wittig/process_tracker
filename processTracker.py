@@ -34,11 +34,6 @@ class Process:
     def __init__(self, process_name):
         self.process_name = process_name
         self.task_list = []
-        self.start_time = time.time()
-        self.end_time = None
-
-    def set_end_time(self):
-        self.end_time = time.time()
 
     def add_task(self, task):
         self.task_list.append(task)
@@ -52,19 +47,27 @@ class Process:
     def get_json_object(self):
         process = {
             "process_name": self.process_name,
-            "startTime": self.start_time,
-            "endTime": self.end_time
+            "task_list": self.task_list
         }
         return process
 
-    def get_run_time(self):
-        return self.end_time-self.start_time
+    def get_latest_task(self):
+            return self.task_list[-1]
 
 
 class Task:
-    def __init__(self, start_time, end_time):
-        self.startTime = start_time
-        self.endTime = end_time
+    def __init__(self):
+        self.start_time = time.time()
+        self.end_time = None
+
+    def set_end_time(self):
+        self.end_time = time.time()
+
+    def get_end_time(self):
+        return self.end_time
+
+    def get_run_time(self):
+        return self.end_time-self.start_time
 
 
 class TimeTracker:
@@ -88,33 +91,66 @@ class TimeTracker:
                 is_contained = True
         return is_contained
 
+    def get_process_list_without_doubles(self):
+        psutil_process_list = psutil.process_iter()
+        return_process_list = []
+        for process in psutil_process_list:
+            if str(process.name()) not in return_process_list:
+                return_process_list.append(process.name())
+        return return_process_list
+
+    def get_process_by_name(self, process_name):
+        for current_process in self.process_object_list:
+            if str(process_name) == str(current_process.get_process_name()):
+                return current_process
+
+    def get_process_index_by_name(self, process_name):
+        counter = 0
+        for current_process in self.process_object_list:
+            if str(process_name) == str(current_process.get_process_name()):
+                return counter
+        counter += 1
+
+    def add_processes(self):
+        """start initial process_list"""
+        for process_name in self.get_process_list_without_doubles():
+            if self.is_name_already_in_process_list(process_name):
+                """process already in list"""
+                """end_time is none --> task still running"""
+                """end_time is not none -> task was terminated, create new task if running"""
+                if self.get_process_by_name(process_name).get_latest_task().get_end_time() is not None:
+                    task = Task()
+                    self.process_object_list[self.get_process_index_by_name(process_name)].get_task_list().append(task)
+                    print("process: " + process_name + " just restarted")
+            else:
+                """Process is not in process_object_list"""
+                current_process = Process(process_name)
+                """add process to list with task, which contains all the time_info"""
+                task = Task()
+                current_process.add_task(task)
+                self.process_object_list.append(current_process)
+                print("process: " + current_process.get_process_name() + " just started")
+
+    def check_running_processes(self):
+        """give process end_time if not running anymore"""
+        for list_process in self.process_object_list:
+            is_contained = False
+            for running_process in self.get_process_list_without_doubles():
+                if str(running_process) == str(list_process.get_process_name()):
+                    is_contained = True
+            if is_contained is False:
+                """task no longer running, set endTime"""
+                if list_process.get_latest_task().get_end_time() is None:
+                    print("process: " + list_process.get_process_name() + " just ended")
+                    list_process.get_latest_task().set_end_time()
+
     def start_logging(self, delay):
         print("Logging started...")
         self.running = True
 
         while self.running:
-            """start initial process_list"""
-            for proc in psutil.process_iter():
-                process_name = proc.name()
-                print(proc.pid)
-                current_process = Process(process_name)
-                if self.is_name_already_in_process_list(process_name):
-                    """process already in list"""
-                else:
-                    """Process is not in process_object_list"""
-                    """add process to list"""
-                    self.process_object_list.append(current_process)
-
-            """give process end_time if not running anymore"""
-            for list_process in self.process_object_list:
-                is_contained = False
-                for running_process in psutil.process_iter():
-                    if str(running_process.name()) == str(list_process.get_process_name()):
-                        is_contained = True
-                if is_contained is False:
-                    """process no longer running, set endTime"""
-                    list_process.set_end_time()
-
+            self.add_processes()
+            self.check_running_processes()
             time.sleep(delay)
 
     def stop_logging(self):
