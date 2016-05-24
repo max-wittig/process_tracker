@@ -20,7 +20,7 @@ class JsonReaderWriter:
         if self.file is not None:
             for process in process_object_list:
                 """get process_json from object and add it to list, which can be printed"""
-                self.process_list.append(process.get_json_object())
+                self.process_list.append(process.to_json())
             json.dump(self.process_list, self.file, indent=2)
 
     def get_existing_process_list(self):
@@ -34,6 +34,13 @@ class Process:
     def __init__(self, process_name):
         self.process_name = process_name
         self.task_list = []
+        self.running = True
+
+    def set_running(self, running):
+        self.running = running
+
+    def is_running(self):
+        return self.running
 
     def add_task(self, task):
         self.task_list.append(task)
@@ -44,10 +51,13 @@ class Process:
     def get_process_name(self):
         return self.process_name
 
-    def get_json_object(self):
+    def to_json(self):
+        json_task_list = []
+        for task in self.task_list:
+            json_task_list.append(task.to_json())
         process = {
             "process_name": self.process_name,
-            "task_list": self.task_list
+            "task_list": json_task_list
         }
         return process
 
@@ -68,6 +78,12 @@ class Task:
 
     def get_run_time(self):
         return self.end_time-self.start_time
+
+    def to_json(self):
+        return {
+            "start_time": self.start_time,
+            "end_time": self.start_time
+        }
 
 
 class TimeTracker:
@@ -118,10 +134,11 @@ class TimeTracker:
                 """process already in list"""
                 """end_time is none --> task still running"""
                 """end_time is not none -> task was terminated, create new task if running"""
-                if self.get_process_by_name(process_name).get_latest_task().get_end_time() is not None:
+                if self.process_object_list[self.get_process_index_by_name(process_name)].is_running() is False:
                     task = Task()
                     self.process_object_list[self.get_process_index_by_name(process_name)].get_task_list().append(task)
                     print("process: " + process_name + " just restarted")
+                    self.get_process_by_name(process_name).set_running(True)
             else:
                 """Process is not in process_object_list"""
                 current_process = Process(process_name)
@@ -142,6 +159,7 @@ class TimeTracker:
                 """task no longer running, set endTime"""
                 if list_process.get_latest_task().get_end_time() is None:
                     print("process: " + list_process.get_process_name() + " just ended")
+                    list_process.set_running = False
                     list_process.get_latest_task().set_end_time()
 
     def start_logging(self, delay):
@@ -149,8 +167,8 @@ class TimeTracker:
         self.running = True
 
         while self.running:
-            self.add_processes()
             self.check_running_processes()
+            self.add_processes()
             time.sleep(delay)
 
     def stop_logging(self):
