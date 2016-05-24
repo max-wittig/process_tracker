@@ -9,15 +9,20 @@ class JsonReaderWriter:
         self.file = None
         self.filename = "log.json"
         self.fileContent = ""
+        self.process_list = []
+
+    def create_json_object(self, process_object_list):
+        for process in process_object_list:
+            self.process_list.append(process.process_name)
 
     def open_create_file(self):
         self.file = open(self.filename, "w")
         """self.fileContent = self.file.read()"""
 
-    def write_process_list_to_file(self, process_list):
+    def write_process_list_to_file(self, process_object_list):
         self.open_create_file()
         if self.file is not None:
-            json.dump(process_list, self.file, indent=2)
+            json.dump(process_object_list, self.file, indent=2)
 
     def get_existing_process_list(self):
         if self.fileContent is not None:
@@ -52,7 +57,7 @@ class TimeTracker:
         self.process_list = []
         self.json_reader_writer = JsonReaderWriter()
         self.running = False
-        self.process_object_list = None
+        self.process_object_list = []
         self.processes_to_track = processes_to_track
 
     def get_object_position_with_key(self, key):
@@ -75,58 +80,34 @@ class TimeTracker:
 
         while self.running:
             for proc in psutil.process_iter():
-                current_process = Process(proc.name())
-                """all processes should be tracked"""
-                if self.processes_to_track is None:
-                    if current_process not in self.processes_to_track:
-                        self.process_object_list.append(current_process)
-                    else:
-                        """is already in process_object_list"""
-                        for process in self.process_object_list:
-                            if current_process is process:
-                                """check if task is already in"""
-                                task = Task(time.time(), "")
-                                for task_in_list in process.get_task_list():
-                                    if task is task_in_list:
-                                        process.add_task(task)
+                process_name = proc.name()
+                current_process = Process(process_name)
+                if current_process not in self.process_object_list:
+                    """add process to list"""
+                    self.process_object_list.append(current_process)
 
-                else:
-                    """only process in list should be tracked"""
-                    if self.processes_to_track is not None and self.process_object_list is None:
-                        self.process_object_list = self.processes_to_track
-            time.sleep(delay)
-
-        """Used to tell, when the tracking ended"""
-        dummy_object = {"name": "dummy",
-                        "startTime": time.time(),
-                        "latestRunTime": time.time()}
-        self.process_list.append(dummy_object)
+        time.sleep(delay)
+        print(self.process_object_list)
 
     def stop_logging(self):
         print("Logging stopped")
         self.running = False
 
     def print_process_list(self):
-        print(self.process_list)
+        print(self.process_object_list)
 
     def write_process_list(self):
         print(self.json_reader_writer.filename + " written")
-        self.json_reader_writer.write_process_list_to_file(self.process_list)
+        self.json_reader_writer.write_process_list_to_file(self.process_object_list)
 
 
 def main():
     processes_to_track_string = input("Input all processes to track, separated by space\n")
     processes_to_track = processes_to_track_string.split(' ')
     print(processes_to_track)
-
-    if processes_to_track is not None and processes_to_track is not '':
-        process_object_list = []
-        for process in processes_to_track:
-            process_object = Process(process)
-            process_object_list.append(process_object)
-    else:
-        process_object_list = None
-    time_tracker = TimeTracker(process_object_list)
+    if processes_to_track[0] is '':
+        processes_to_track = None
+    time_tracker = TimeTracker(processes_to_track)
     thread = threading.Thread(target=time_tracker.start_logging, args=(1, ))
     """thread dies, if main dies"""
     thread.setDaemon(True)
@@ -136,6 +117,7 @@ def main():
     time_tracker.stop_logging()
     """wait for thread to finish"""
     thread.join()
+    #time_tracker.print_process_list()
     time_tracker.write_process_list()
 
 if __name__ == '__main__':
