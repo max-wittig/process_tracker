@@ -100,13 +100,27 @@ class TimeTracker:
                 is_contained = True
         return is_contained
 
+    def user_filter_processes(self, return_process_list):
+        filtered_list = []
+        for process in return_process_list:
+            for u_process in self.processes_to_track:
+                if process == u_process:
+                    filtered_list.append(process)
+        return filtered_list
+
+    """gets processes from process_iter and kills double processes"""
     def get_process_list_without_doubles(self):
         psutil_process_list = psutil.process_iter()
         return_process_list = []
         for process in psutil_process_list:
             if str(process.name()) not in return_process_list:
                 return_process_list.append(process.name())
-        return return_process_list
+
+        if return_process_list is not None:
+            """filters out processes, which the user doesn't want to see"""
+            return self.user_filter_processes(return_process_list)
+        else:
+            return return_process_list
 
     def get_process_by_name(self, process_name):
         for current_process in self.process_object_list:
