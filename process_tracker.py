@@ -200,7 +200,7 @@ def main():
     if processes_to_track[0] is '':
         processes_to_track = None
     time_tracker = TimeTracker(processes_to_track)
-    thread = threading.Thread(target=time_tracker.start_logging, args=(1, ))
+    thread = threading.Thread(target=time_tracker.start_logging, args=(10, ))
     """thread dies, if main dies"""
     thread.setDaemon(True)
     thread.start()
