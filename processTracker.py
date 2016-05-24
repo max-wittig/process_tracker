@@ -93,13 +93,6 @@ class TimeTracker:
         self.process_object_list = []
         self.processes_to_track = processes_to_track
 
-    def get_object_position_with_key(self, key):
-        counter = 0
-        for process in self.process_object_list:
-            if str(key) is process.get_process_name():
-                return counter
-            counter += 1
-
     def is_name_already_in_process_list(self, process_name):
         is_contained = False
         for current_process in self.process_object_list:
@@ -135,11 +128,13 @@ class TimeTracker:
                 """process already in list"""
                 """end_time is none --> task still running"""
                 """end_time is not none -> task was terminated, create new task if running"""
-                if self.process_object_list[self.get_process_index_by_name(process_name)].is_running() is False:
-                    task = Task()
-                    self.process_object_list[self.get_process_index_by_name(process_name)].get_task_list().append(task)
-                    print("process: " + process_name + " just restarted")
-                    self.get_process_by_name(process_name).set_running(True)
+                for process in self.process_object_list:
+                    if process.is_running() is False:
+                        if process.get_process_name() == process_name:
+                            task = Task()
+                            process.get_task_list().append(task)
+                            print("process: " + process_name + " just restarted")
+                            self.get_process_by_name(process_name).set_running(True)
             else:
                 """Process is not in process_object_list"""
                 current_process = Process(process_name)
