@@ -82,7 +82,7 @@ class Task:
     def to_json(self):
         return {
             "start_time": self.start_time,
-            "end_time": self.start_time
+            "end_time": self.end_time
         }
 
 
@@ -125,6 +125,7 @@ class TimeTracker:
         for current_process in self.process_object_list:
             if str(process_name) == str(current_process.get_process_name()):
                 return counter
+        print(counter)
         counter += 1
 
     def add_processes(self):
@@ -159,7 +160,7 @@ class TimeTracker:
                 """task no longer running, set endTime"""
                 if list_process.get_latest_task().get_end_time() is None:
                     print("process: " + list_process.get_process_name() + " just ended")
-                    list_process.set_running = False
+                    list_process.set_running(False)
                     list_process.get_latest_task().set_end_time()
 
     def start_logging(self, delay):
@@ -199,7 +200,6 @@ def main():
     time_tracker.stop_logging()
     """wait for thread to finish"""
     thread.join()
-    #time_tracker.print_process_list()
     time_tracker.write_process_list()
 
 if __name__ == '__main__':
