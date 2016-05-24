@@ -1,89 +1,9 @@
 import psutil
-import json
-import time
 import threading
-
-
-class JsonReaderWriter:
-    def __init__(self):
-        self.file = None
-        self.filename = "log.json"
-        self.fileContent = ""
-        self.process_list = []
-
-    def open_create_file(self):
-        self.file = open(self.filename, "w")
-        """self.fileContent = self.file.read()"""
-
-    def write_process_list_to_file(self, process_object_list):
-        self.open_create_file()
-        if self.file is not None:
-            for process in process_object_list:
-                """get process_json from object and add it to list, which can be printed"""
-                self.process_list.append(process.to_json())
-            json.dump(self.process_list, self.file, indent=2)
-
-    def get_existing_process_list(self):
-        if self.fileContent is not None:
-            return self.fileContent
-        else:
-            return None
-
-
-class Process:
-    def __init__(self, process_name):
-        self.process_name = process_name
-        self.task_list = []
-        self.running = True
-
-    def set_running(self, running):
-        self.running = running
-
-    def is_running(self):
-        return self.running
-
-    def add_task(self, task):
-        self.task_list.append(task)
-
-    def get_task_list(self):
-        return self.task_list
-
-    def get_process_name(self):
-        return self.process_name
-
-    def to_json(self):
-        json_task_list = []
-        for task in self.task_list:
-            json_task_list.append(task.to_json())
-        process = {
-            "process_name": self.process_name,
-            "task_list": json_task_list
-        }
-        return process
-
-    def get_latest_task(self):
-            return self.task_list[-1]
-
-
-class Task:
-    def __init__(self):
-        self.start_time = time.time()
-        self.end_time = None
-
-    def set_end_time(self):
-        self.end_time = time.time()
-
-    def get_end_time(self):
-        return self.end_time
-
-    def get_run_time(self):
-        return self.end_time-self.start_time
-
-    def to_json(self):
-        return {
-            "start_time": self.start_time,
-            "end_time": self.end_time
-        }
+import time
+from task import Task
+from process import Process
+from json_tool import JsonReaderWriter
 
 
 class TimeTracker:
@@ -205,7 +125,8 @@ def main():
     thread.setDaemon(True)
     thread.start()
     time.sleep(2)
-    input("Press return to stop logging\n")
+    print("------------------------------")
+    input("Press return to stop logging\n------------------------------\n")
     time_tracker.stop_logging()
     """wait for thread to finish"""
     thread.join()
