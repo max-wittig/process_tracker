@@ -116,7 +116,7 @@ class TimeTracker:
             if str(process.name()) not in return_process_list:
                 return_process_list.append(process.name())
 
-        if return_process_list is not None:
+        if self.processes_to_track is not None:
             """filters out processes, which the user doesn't want to see"""
             return self.user_filter_processes(return_process_list)
         else:
