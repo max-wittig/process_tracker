@@ -6,11 +6,14 @@ class Task:
         self.start_time = time.time()
         self.end_time = None
 
+    def set_start_time(self, start_time):
+        self.start_time = start_time
+
     def get_start_time(self):
         return self.start_time
 
-    def set_end_time(self):
-        self.end_time = time.time()
+    def set_end_time(self, end_time=time.time()):
+        self.end_time = end_time
 
     def get_end_time(self):
         return self.end_time

@@ -32,7 +32,7 @@ class ProcessVisualizer:
     def get_range(self):
         min_range = self.get_min_range()
         max_range = self.get_max_range()
-        return range(min_range, max_range)
+        return range(int(min_range), int(max_range))
 
     def setup_line_chart(self):
         self.line_chart.title = "Process Runtime"
@@ -50,12 +50,14 @@ class ProcessVisualizer:
     def visualize_data(self):
         self.setup_line_chart()
         self.insert_data_from_process_list()
+        self.save_svg_to_file()
 
 
 def main():
-    json_reader_writer = JsonReaderWriter()
-    json_reader_writer.open_file()
-    process_object_list = json_reader_writer.get_existing_process_list()
+    json_reader = JsonReaderWriter()
+    json_reader.open_file()
+    process_object_list = json_reader.get_existing_process_list()
+    print(process_object_list[1].get_task_list())
     process_visualizer = ProcessVisualizer(process_object_list)
     process_visualizer.visualize_data()
 
