@@ -1,4 +1,6 @@
 /log.txt
 /.idea
 /TimeTracker.iml
-/log.json
+log.json
+__pycache__/
+*.svg

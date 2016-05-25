@@ -1,4 +1,3 @@
-
 class Process:
     def __init__(self, process_name):
         self.process_name = process_name

@@ -6,6 +6,9 @@ class Task:
         self.start_time = time.time()
         self.end_time = None
 
+    def get_start_time(self):
+        return self.start_time
+
     def set_end_time(self):
         self.end_time = time.time()
 
