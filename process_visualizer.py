@@ -36,13 +36,17 @@ class ProcessVisualizer:
 
     def setup_line_chart(self):
         self.line_chart.title = "Process Runtime"
-        self.line_chart.x_labels = map(str, self.get_range())
+        #self.line_chart.x_labels = map(self.get_range(), str)
+        self.line_chart.y_labels = map(str, self.get_range())
 
     def insert_data_from_process_list(self):
         for process in self.process_object_list:
             tasks = process.get_task_list()
+            start_time_list = []
             for task in tasks:
-                self.line_chart.add(process.get_process_name(), [])
+                start_time_list.append(task.get_start_time())
+                start_time_list.append(task.get_end_time())
+            self.line_chart.add(process.get_process_name(), start_time_list)
 
     def save_svg_to_file(self):
         self.line_chart.render_to_file(self.filename)
