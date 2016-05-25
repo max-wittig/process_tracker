@@ -1,6 +1,6 @@
 {
   "name": "Process tracker",
   "tagline": "small command line program, which tracks the current running processes",
-  "body": "psutil is required:\r\n`pip install psutil`\r\nif not already installed",
+  "body": "# Process_Tracker\r\nsmall command line program, which tracks the current running processes\r\n\r\nonly works with python3  \r\npsutil is required   \r\n`pip3 install psutil`",
   "note": "Don't delete this file! It's used internally to help with page regeneration."
 }
