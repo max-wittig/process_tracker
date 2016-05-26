@@ -1,11 +1,13 @@
 import pygal
 import sys
 from json_tool import JsonReaderWriter
+import gantt
+import datetime
 
 
 class ProcessVisualizer:
     def __init__(self, process_object_list):
-        self.line_chart = pygal.Line()
+        self.line_chart = pygal.HorizontalBar()
         self.process_object_list = process_object_list
         self.filename = "chart.svg"
 
@@ -20,7 +22,7 @@ class ProcessVisualizer:
         return max_start_time
 
     def get_min_range(self):
-        min_start_time = sys.float_info.max
+        min_start_time = sys.maxsize
         for process in self.process_object_list:
             task_list = process.get_task_list()
             for task in task_list:
@@ -32,7 +34,7 @@ class ProcessVisualizer:
     def get_range(self):
         min_range = self.get_min_range()
         max_range = self.get_max_range()
-        return range(int(min_range), int(max_range))
+        return range(min_range, max_range)
 
     def setup_line_chart(self):
         self.line_chart.title = "Process Runtime"

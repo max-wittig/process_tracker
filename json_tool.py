@@ -2,6 +2,7 @@ import json
 from process import Process
 from task import Task
 
+
 class JsonReaderWriter:
     def __init__(self):
         self.file = None
@@ -37,7 +38,7 @@ class JsonReaderWriter:
                 for json_task in json_task_list:
                     task = Task()
                     task.set_start_time(json_task['start_time'])
-                    task.set_end_time(json_task['end_time'])
+                    task.set_json_end_time(json_task['end_time'])
                     task_list.append(task)
                 process.set_task_list(task_list)
                 process_object_list.append(process)

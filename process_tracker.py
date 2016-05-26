@@ -89,8 +89,8 @@ class TimeTracker:
                 """task no longer running, set endTime"""
                 if list_process.get_latest_task().get_end_time() is None:
                     print("process: " + list_process.get_process_name() + " just ended")
-                    list_process.set_running(False)
                     list_process.get_latest_task().set_end_time()
+                    list_process.set_running(False)
 
     def start_logging(self, delay):
         print("Logging started...")
