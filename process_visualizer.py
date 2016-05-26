@@ -1,11 +1,9 @@
-import pygal
 import sys
 from json_tool import JsonReaderWriter
 
 
 class ProcessVisualizer:
     def __init__(self, process_object_list):
-        self.line_chart = pygal.HorizontalBar()
         self.process_object_list = process_object_list
         self.filename = "chart.svg"
 
@@ -34,11 +32,6 @@ class ProcessVisualizer:
         max_range = self.get_max_range()
         return range(min_range, max_range)
 
-    def setup_line_chart(self):
-        self.line_chart.title = "Process Runtime"
-        #self.line_chart.x_labels = map(self.get_range(), str)
-        self.line_chart.y_labels = map(str, self.get_range())
-
     def get_project_name_list(self):
         process_name_list = []
         for process in self.process_object_list:
@@ -52,15 +45,14 @@ class ProcessVisualizer:
             for task in tasks:
                 start_time_list.append(task.get_start_time())
                 start_time_list.append(task.get_end_time())
-            self.line_chart.add(process.get_process_name(), start_time_list)
 
-    def save_svg_to_file(self):
-        self.line_chart.render_to_file(self.filename)
+    #def save_svg_to_file(self):
+        #self.line_chart.render_to_file(self.filename)
 
     def visualize_data(self):
-        self.setup_line_chart()
+        #self.setup_line_chart()
         self.insert_data_from_process_list()
-        self.save_svg_to_file()
+        #self.save_svg_to_file()
 
 
 def main():
