@@ -1,8 +1,6 @@
 import pygal
 import sys
 from json_tool import JsonReaderWriter
-import gantt
-import datetime
 
 
 class ProcessVisualizer:
