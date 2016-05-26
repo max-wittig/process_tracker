@@ -39,6 +39,12 @@ class ProcessVisualizer:
         #self.line_chart.x_labels = map(self.get_range(), str)
         self.line_chart.y_labels = map(str, self.get_range())
 
+    def get_project_name_list(self):
+        process_name_list = []
+        for process in self.process_object_list:
+            process_name_list.append(process.get_process_name())
+        return process_name_list
+
     def insert_data_from_process_list(self):
         for process in self.process_object_list:
             tasks = process.get_task_list()
