@@ -1,4 +1,3 @@
-
 class Process:
     def __init__(self, process_name):
         self.process_name = process_name
@@ -16,6 +15,9 @@ class Process:
 
     def get_task_list(self):
         return self.task_list
+
+    def set_task_list(self, task_list):
+        self.task_list = task_list
 
     def get_process_name(self):
         return self.process_name
