@@ -101,7 +101,14 @@ class TimeTracker:
             self.add_processes()
             time.sleep(delay)
 
+    def add_end_time_to_all_tasks(self):
+        for process in self.process_object_list:
+            for task in process.get_task_list():
+                if task.get_end_time() is None:
+                    task.set_end_time()
+
     def stop_logging(self):
+        self.add_end_time_to_all_tasks()
         print("Logging stopped")
         self.running = False
 
