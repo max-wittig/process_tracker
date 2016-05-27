@@ -4,5 +4,3 @@
 *.json
 __pycache__/
 *.svg
-Gantt.py
-process_visualizer.py
