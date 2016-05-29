@@ -4,6 +4,7 @@ import time
 from task import Task
 from process import Process
 from json_tool import JsonReaderWriter
+from module import Module
 
 
 class TimeTracker:
@@ -36,7 +37,7 @@ class TimeTracker:
             if str(process.name()) not in return_process_list:
                 return_process_list.append(process.name())
 
-        if self.processes_to_track is not None:
+        if self.processes_to_track is not None and len(self.processes_to_track) < 1:
             """filters out processes, which the user doesn't want to see"""
             return self.user_filter_processes(return_process_list)
         else:
@@ -122,10 +123,15 @@ class TimeTracker:
 
 def main():
     processes_to_track_string = input("Input all processes to track, separated by space\n")
-    processes_to_track = processes_to_track_string.split(' ')
+    if "module_load" in processes_to_track_string:
+        processes_to_track = processes_to_track_string.split(' ')
+        """opens module file with array and programs to track in it"""
+        module = Module(processes_to_track[1])
+        processes_to_track = module.get_processes_to_track()
+    else:
+        processes_to_track = processes_to_track_string.split(' ')
+
     print(processes_to_track)
-    if processes_to_track[0] is '':
-        processes_to_track = None
     time_tracker = TimeTracker(processes_to_track)
     thread = threading.Thread(target=time_tracker.start_logging, args=(10, ))
     """thread dies, if main dies"""
