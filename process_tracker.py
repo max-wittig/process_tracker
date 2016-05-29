@@ -124,14 +124,21 @@ class TimeTracker:
 def main():
     processes_to_track_string = input("Input all processes to track, separated by space\n")
     processes_to_track = processes_to_track_string.split(' ')
+    time_delay = 5
     if "settings_load" == processes_to_track[0]:
         """opens settings file with array and programs to track in it"""
-        settings = Settings(processes_to_track[1])
-        processes_to_track = settings.get_processes_to_track()
+        try:
+            settings = Settings(processes_to_track[1])
+            processes_to_track = settings.get_processes_to_track()
+            time_delay = settings.get_time_delay()
+        except:
+            print("Invalid settings json")
+            main()
 
     print(processes_to_track)
+    print("time_delay=" + str(time_delay))
     time_tracker = TimeTracker(processes_to_track)
-    thread = threading.Thread(target=time_tracker.start_logging, args=(10, ))
+    thread = threading.Thread(target=time_tracker.start_logging, args=(time_delay, ))
     """thread dies, if main dies"""
     thread.setDaemon(True)
     thread.start()
