@@ -6,7 +6,7 @@ import time
 from task import Task
 from process import Process
 from json_tool import JsonReaderWriter
-from settings import Settings
+from setting import Setting
 
 
 class TimeTracker:
@@ -130,7 +130,7 @@ def main():
     if "settings_load" == processes_to_track[0]:
         """opens settings file with array and programs to track in it"""
         try:
-            settings = Settings(processes_to_track[1])
+            settings = Setting(processes_to_track[1])
             processes_to_track = settings.get_processes_to_track()
             time_delay = settings.get_time_delay()
         except:

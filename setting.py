@@ -1,7 +1,7 @@
 import json
 
 
-class Settings:
+class Setting:
     def __init__(self, filename):
         self.filename = filename
         self.file = None
