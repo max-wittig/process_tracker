@@ -1,7 +1,7 @@
 import json
 
 
-class Module:
+class Settings:
     def __init__(self, filename):
         self.filename = filename
         self.file = None
@@ -11,5 +11,5 @@ class Module:
         return json.loads(self.get_json())
 
     def get_json(self):
-        self.file = open("modules/" + self.filename)
+        self.file = open("settings/" + self.filename)
         return self.file.read()

@@ -1,0 +1,5 @@
+{
+  "processes_to_track": ["chrome","firefox", "thunderbird", "telegram", "bash", "ssh", "corebird", "code", "java", "python"],
+  "time_delay": 2,
+  "excluded_processes": []
+}
