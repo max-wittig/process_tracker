@@ -1,3 +1,5 @@
+#!/usr/bin/python3
+
 import psutil
 import threading
 import time
@@ -134,6 +136,9 @@ def main():
         except:
             print("Invalid settings json")
             main()
+
+    if processes_to_track[0] == '':
+        processes_to_track = None
 
     print(processes_to_track)
     print("time_delay=" + str(time_delay))
