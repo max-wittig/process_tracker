@@ -48,12 +48,12 @@ class TimeTracker:
             if str(process.name()) not in return_process_list:
                 return_process_list.append(process.name())
 
-        if self.processes_to_track is not None:
-            if self.excluded_processes is []:
-                """filters out processes, which the user doesn't want to see"""
-                return self.user_include_filter_processes(return_process_list)
-            else:
-                return self.user_exclude_filter_processes(return_process_list)
+        """excluded processes are priority"""
+        if len(self.excluded_processes) > 0:
+            return self.user_exclude_filter_processes(return_process_list)
+        elif len(self.processes_to_track) > 0:
+            """filters out processes, which the user doesn't want to see"""
+            return self.user_include_filter_processes(return_process_list)
         else:
             return return_process_list
 
