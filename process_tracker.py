@@ -150,10 +150,8 @@ def show_help():
     sys.exit(0)
 
 
-
 def main():
     settings = Setting()
-    filename = "log.json"
     try:
         opts, args = getopt.getopt(sys.argv[1:], "hl:o:i:e:", ["help", "load=", "output=", "included="])
     except getopt.GetoptError as err:
