@@ -66,7 +66,7 @@ def main():
             settings_builder.save_settings("settings/" + a)
             print("settings saved in " + a)
             sys.exit(0)
-        if o in ("-d", "--debug"):
+        elif o in ("-d", "--debug"):
             settings = get_settings_from_user()
         else:
             assert False, "unhandled option"
