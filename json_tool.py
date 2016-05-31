@@ -12,13 +12,16 @@ class JsonReaderWriter:
 
     def open_file(self):
         self.file = open(self.filename, "r")
-        self.fileContent = self.file.read()
 
     def create_file(self):
         self.file = open(self.filename, "w")
 
     def get_file_content(self):
+        self.fileContent = self.file.read()
         return self.fileContent
+
+    def get_json(self):
+        return json.loads(self.get_file_content())
 
     def write_process_list_to_file(self, process_object_list):
         self.create_file()
@@ -27,6 +30,10 @@ class JsonReaderWriter:
                 """get process_json from object and add it to list, which can be printed"""
                 self.process_list.append(process.to_json())
             json.dump(self.process_list, self.file, indent=2)
+
+    def write_settings_to_file(self, settings):
+        self.create_file()
+        json.dump(settings.to_json(), self.file, indent=2)
 
     def get_existing_process_list(self):
         if self.fileContent is not None:

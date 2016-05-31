@@ -1,4 +1,5 @@
 import json
+from json_tool import JsonReaderWriter
 
 
 class Setting:
@@ -36,6 +37,15 @@ class Setting:
     def set_excluded_processes(self, excluded_processes):
         self.excluded_processes = excluded_processes
 
+    def to_json(self):
+        settings = {
+            "processes_to_track": self.processes_to_track,
+            "time_delay": self.time_delay,
+            "excluded_processes": self.excluded_processes,
+            "log_filename": self.log_filename
+        }
+        return settings
+
     def parse(self):
         self.processes_to_track = self.file_content_object["processes_to_track"]
         self.time_delay = self.file_content_object["time_delay"]
@@ -43,6 +53,7 @@ class Setting:
         self.log_filename = self.file_content_object["log_filename"]
 
     def read_json(self):
-        self.file = open(self.filename)
-        self.file_content_object = json.loads(self.file.read())
+        json_reader = JsonReaderWriter(filename=self.filename)
+        json_reader.open_file()
+        self.file_content_object = json_reader.get_json()
         self.parse()
