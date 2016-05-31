@@ -10,7 +10,7 @@ from json_tool import JsonReaderWriter
 from setting import Setting
 
 
-class TimeTracker:
+class ProcessTracker:
     def __init__(self, settings):
         self.filename = settings.get_log_filename()
         self.json_reader_writer = JsonReaderWriter(self.filename)
@@ -140,11 +140,11 @@ class TimeTracker:
 def show_help():
     print("\n")
     print("--------USAGE--------")
-    print("-h --help                                          : prints this help page")
-    print("-l <arg> --load <arg>                              : load settings file from <arg>")
-    print("-o <arg> --output <arg>                            : specify output filename")
-    print("-i arg1 arg2 arg3 ... --include arg1 arg2 arg3 ... : set processes that should be tracked")
-    print("-e arg1 arg2 arg3 ... --exclude arg1 arg2 arg3 ... : set processes that shouldn't be tracked")
+    print("-h --help                                              : prints this help page")
+    print("-l <arg> --load <arg>                                  : load settings file from <arg>")
+    print("-o <arg> --output <arg>                                : specify output filename")
+    print("-i 'arg1 arg2 arg3' ... --include 'arg1 arg2 arg3' ... : set processes that should be tracked")
+    print("-e 'arg1 arg2 arg3' ... --exclude 'arg1 arg2 arg3' ... : set processes that shouldn't be tracked")
     print("---------------------")
     print("\n")
     sys.exit(0)
@@ -153,7 +153,8 @@ def show_help():
 def main():
     settings = Setting()
     try:
-        opts, args = getopt.getopt(sys.argv[1:], "hl:o:i:e:", ["help", "load=", "output=", "included="])
+        opts, args = getopt.getopt(sys.argv[1:], "hl:o:i:e:b:",
+                                   ["help", "load=", "output=", "included=", "excluded=", "build="])
     except getopt.GetoptError as err:
         # print help information and exit:
         print(err)  # will print something like "option -a not recognized"
@@ -164,7 +165,7 @@ def main():
             show_help()
         elif o in ("-l", "--load"):
             try:
-                settings.load_from_file(a)
+                settings.load_from_file("settings/" + a)
                 print(a)
             except:
                 print("settings file not found")
@@ -177,22 +178,25 @@ def main():
         elif o in ("-e", "--excluded"):
             excluded_processes = a.split(' ')
             settings.set_excluded_processes(excluded_processes)
+        elif o in ("-b", "--build"):
+            excluded_processes = a.split(' ')
+            settings.set_excluded_processes(excluded_processes)
         else:
             assert False, "unhandled option"
 
     print("time_delay=" + str(settings.get_time_delay()))
-    time_tracker = TimeTracker(settings)
-    thread = threading.Thread(target=time_tracker.start_logging, args=(settings.get_time_delay(), ))
+    process_tracker = ProcessTracker(settings)
+    thread = threading.Thread(target=process_tracker.start_logging, args=(settings.get_time_delay(), ))
     """thread dies, if main dies"""
     thread.setDaemon(True)
     thread.start()
     time.sleep(2)
     print("------------------------------")
     input("Press return to stop logging\n------------------------------\n")
-    time_tracker.stop_logging()
+    process_tracker.stop_logging()
     """wait for thread to finish"""
     thread.join()
-    time_tracker.write_process_list()
+    process_tracker.write_process_list()
 
 if __name__ == '__main__':
     main()
