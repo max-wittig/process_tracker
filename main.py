@@ -21,11 +21,22 @@ def show_help():
     sys.exit(0)
 
 
+def get_settings_from_user():
+    settings = Setting()
+    processes_to_track = input("processes to track: ")
+    time_delay = input("time delay: ")
+    save_location = input("log filename: ")
+    settings.set_processes_to_track(processes_to_track.split(' '))
+    settings.set_time_delay(int(time_delay))
+    settings.set_log_filename(save_location)
+    return settings
+
+
 def main():
     settings = Setting()
     try:
-        opts, args = getopt.getopt(sys.argv[1:], "hl:o:i:e:b:",
-                                   ["help", "load=", "output=", "included=", "excluded=", "build="])
+        opts, args = getopt.getopt(sys.argv[1:], "hl:o:i:e:b:d",
+                                   ["help", "load=", "output=", "included=", "excluded=", "build=", "debug"])
     except getopt.GetoptError as err:
         # print help information and exit:
         print(err)  # will print something like "option -a not recognized"
@@ -55,7 +66,8 @@ def main():
             settings_builder.save_settings("settings/" + a)
             print("settings saved in " + a)
             sys.exit(0)
-
+        if o in ("-d", "--debug"):
+            settings = get_settings_from_user()
         else:
             assert False, "unhandled option"
 

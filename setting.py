@@ -30,6 +30,9 @@ class Setting:
     def get_time_delay(self):
         return self.time_delay
 
+    def set_time_delay(self, time_delay):
+        self.time_delay = time_delay
+
     def get_excluded_processes(self):
         return self.excluded_processes
 
