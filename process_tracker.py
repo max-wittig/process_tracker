@@ -8,7 +8,7 @@ from json_tool import JsonTool
 class ProcessTracker:
     def __init__(self, settings):
         self.filename = settings.get_log_filename()
-        self.json_reader_writer = JsonTool(self.filename)
+        self.json_reader_writer = JsonTool("logs/" + self.filename)
         self.running = False
         self.process_object_list = []
         self.settings = settings
