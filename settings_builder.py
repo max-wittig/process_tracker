@@ -1,6 +1,6 @@
 from setting import Setting
 from process_tracker import ProcessTracker
-from json_tool import JsonReaderWriter
+from json_tool import JsonTool
 import time
 
 
@@ -28,5 +28,5 @@ class SettingsBuilder:
         self.set_all_current_processes_to_be_excluded(build_time=build_time)
 
     def save_settings(self, filename):
-        json_writer = JsonReaderWriter(filename=filename)
+        json_writer = JsonTool(filename=filename)
         json_writer.write_settings_to_file(self.settings)

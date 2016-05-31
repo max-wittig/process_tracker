@@ -2,13 +2,13 @@ import psutil
 import time
 from task import Task
 from process import Process
-from json_tool import JsonReaderWriter
+from json_tool import JsonTool
 
 
 class ProcessTracker:
     def __init__(self, settings):
         self.filename = settings.get_log_filename()
-        self.json_reader_writer = JsonReaderWriter(self.filename)
+        self.json_reader_writer = JsonTool(self.filename)
         self.running = False
         self.process_object_list = []
         self.settings = settings

@@ -3,7 +3,7 @@ from process import Process
 from task import Task
 
 
-class JsonReaderWriter:
+class JsonTool:
     def __init__(self, filename="log.json"):
         self.file = None
         self.fileContent = ""
