@@ -10,11 +10,12 @@ from setting import Setting
 
 
 class TimeTracker:
-    def __init__(self, processes_to_track):
+    def __init__(self, settings):
         self.json_reader_writer = JsonReaderWriter()
         self.running = False
         self.process_object_list = []
-        self.processes_to_track = processes_to_track
+        self.processes_to_track = settings.get_processes_to_track()
+        self.excluded_processes = settings.get_excluded_processes()
 
     def is_name_already_in_process_list(self, process_name):
         is_contained = False
@@ -23,12 +24,20 @@ class TimeTracker:
                 is_contained = True
         return is_contained
 
-    def user_filter_processes(self, return_process_list):
+    def user_include_filter_processes(self, return_process_list):
         filtered_list = []
         for process in return_process_list:
             for u_process in self.processes_to_track:
                 if process == u_process:
                     filtered_list.append(process)
+        return filtered_list
+
+    def user_exclude_filter_processes(self, return_process_list):
+        filtered_list = return_process_list
+        for process in return_process_list:
+            for u_process in self.excluded_processes:
+                if process == u_process:
+                    filtered_list.remove(process)
         return filtered_list
 
     """gets processes from process_iter and kills double processes"""
@@ -40,8 +49,11 @@ class TimeTracker:
                 return_process_list.append(process.name())
 
         if self.processes_to_track is not None:
-            """filters out processes, which the user doesn't want to see"""
-            return self.user_filter_processes(return_process_list)
+            if self.excluded_processes is []:
+                """filters out processes, which the user doesn't want to see"""
+                return self.user_include_filter_processes(return_process_list)
+            else:
+                return self.user_exclude_filter_processes(return_process_list)
         else:
             return return_process_list
 
@@ -127,22 +139,23 @@ def main():
     processes_to_track_string = input("Input all processes to track, separated by space\n")
     processes_to_track = processes_to_track_string.split(' ')
     time_delay = 5
+    settings = Setting()
     if "settings_load" == processes_to_track[0]:
         """opens settings file with array and programs to track in it"""
         try:
-            settings = Setting(processes_to_track[1])
-            processes_to_track = settings.get_processes_to_track()
-            time_delay = settings.get_time_delay()
+            settings.load_from_file(processes_to_track[1])
         except:
             print("Invalid settings json")
             main()
 
+    else:
+        settings = Setting()
     if processes_to_track[0] == '':
         processes_to_track = None
 
     print(processes_to_track)
     print("time_delay=" + str(time_delay))
-    time_tracker = TimeTracker(processes_to_track)
+    time_tracker = TimeTracker(settings)
     thread = threading.Thread(target=time_tracker.start_logging, args=(time_delay, ))
     """thread dies, if main dies"""
     thread.setDaemon(True)
