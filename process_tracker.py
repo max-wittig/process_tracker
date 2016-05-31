@@ -1,5 +1,6 @@
 #!/usr/bin/python3
-
+import getopt
+import sys
 import psutil
 import threading
 import time
@@ -11,7 +12,8 @@ from setting import Setting
 
 class TimeTracker:
     def __init__(self, settings):
-        self.json_reader_writer = JsonReaderWriter()
+        self.filename = settings.get_log_filename()
+        self.json_reader_writer = JsonReaderWriter(self.filename)
         self.running = False
         self.process_object_list = []
         self.processes_to_track = settings.get_processes_to_track()
@@ -135,28 +137,54 @@ class TimeTracker:
         self.json_reader_writer.write_process_list_to_file(self.process_object_list)
 
 
+def show_help():
+    print("\n")
+    print("--------USAGE--------")
+    print("-h --help                                          : prints this help page")
+    print("-l <arg> --load <arg>                              : load settings file from <arg>")
+    print("-o <arg> --output <arg>                            : specify output filename")
+    print("-i arg1 arg2 arg3 ... --include arg1 arg2 arg3 ... : set processes that should be tracked")
+    print("-e arg1 arg2 arg3 ... --exclude arg1 arg2 arg3 ... : set processes that shouldn't be tracked")
+    print("---------------------")
+    print("\n")
+    sys.exit(0)
+
+
+
 def main():
-    processes_to_track_string = input("Input all processes to track, separated by space\n")
-    processes_to_track = processes_to_track_string.split(' ')
-    time_delay = 5
     settings = Setting()
-    if "settings_load" == processes_to_track[0]:
-        """opens settings file with array and programs to track in it"""
-        try:
-            settings.load_from_file(processes_to_track[1])
-        except:
-            print("Invalid settings json")
-            main()
+    filename = "log.json"
+    try:
+        opts, args = getopt.getopt(sys.argv[1:], "hl:o:i:e:", ["help", "load=", "output=", "included="])
+    except getopt.GetoptError as err:
+        # print help information and exit:
+        print(err)  # will print something like "option -a not recognized"
+        sys.exit(2)
 
-    else:
-        settings = Setting()
-    if processes_to_track[0] == '':
-        processes_to_track = None
+    for o, a in opts:
+        if o in ("-h", "--help"):
+            show_help()
+        elif o in ("-l", "--load"):
+            try:
+                settings.load_from_file(a)
+                print(a)
+            except:
+                print("settings file not found")
+                exit(1)
+        elif o in ("-o", "--output"):
+            settings.set_log_filename(a)
+        elif o in ("-i", "--included"):
+            processes_to_track = a.split(' ')
+            settings.set_processes_to_track(processes_to_track)
+        elif o in ("-e", "--excluded"):
+            excluded_processes = a.split(' ')
+            settings.set_excluded_processes(excluded_processes)
+        else:
+            assert False, "unhandled option"
 
-    print(processes_to_track)
-    print("time_delay=" + str(time_delay))
+    print("time_delay=" + str(settings.get_time_delay()))
     time_tracker = TimeTracker(settings)
-    thread = threading.Thread(target=time_tracker.start_logging, args=(time_delay, ))
+    thread = threading.Thread(target=time_tracker.start_logging, args=(settings.get_time_delay(), ))
     """thread dies, if main dies"""
     thread.setDaemon(True)
     thread.start()

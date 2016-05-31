@@ -4,11 +4,11 @@ from task import Task
 
 
 class JsonReaderWriter:
-    def __init__(self):
+    def __init__(self, filename="log.json"):
         self.file = None
-        self.filename = "log.json"
         self.fileContent = ""
         self.process_list = []
+        self.filename = filename
 
     def open_file(self):
         self.file = open(self.filename, "r")
