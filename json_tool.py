@@ -15,7 +15,8 @@ class JsonTool:
             return f
 
     def get_json(self):
-            return json.load(self.get_file_content())
+        with open(self.filename) as f:
+            return json.load(f)
 
     def write_process_list_to_file(self, process_object_list):
         with open(self.filename, "w") as f:
