@@ -26,7 +26,7 @@ class ProcessTracker:
         """returns a filtered list, where processes which are not on self.included_processes are filtered out"""
         filtered_list = []
         for process in return_process_list:
-            for u_process in self.settings.get_processes_to_track():
+            for u_process in self.settings.processes_to_track:
                 if process == u_process:
                     filtered_list.append(process)
         return filtered_list
