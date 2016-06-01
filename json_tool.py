@@ -25,7 +25,7 @@ class JsonTool:
             json.dump(self.process_list, f, indent=2)
 
     def write_settings_to_file(self, settings):
-        with open(self.filename) as f:
+        with open(self.filename, "w") as f:
             json.dump(settings.to_json(), f, indent=2)
 
     def get_existing_process_list(self):
