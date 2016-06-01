@@ -2,6 +2,8 @@ from json_tool import JsonTool
 
 
 class Setting:
+    """certain values, which can be read out of a file, which change how the program behaves are in this
+    class"""
     def __init__(self):
         self.filename = None
         self.file = None
@@ -11,33 +13,9 @@ class Setting:
         self.excluded_processes = []
         self.log_filename = "log.json"
 
-    def get_log_filename(self):
-        return self.log_filename
-
-    def set_log_filename(self, filename):
-        self.log_filename = filename
-
     def load_from_file(self, filename):
         self.filename = filename
         self.read_json()
-
-    def get_processes_to_track(self):
-        return self.processes_to_track
-
-    def set_processes_to_track(self, processes_to_track):
-        self.processes_to_track = processes_to_track
-
-    def get_time_delay(self):
-        return self.time_delay
-
-    def set_time_delay(self, time_delay):
-        self.time_delay = time_delay
-
-    def get_excluded_processes(self):
-        return self.excluded_processes
-
-    def set_excluded_processes(self, excluded_processes):
-        self.excluded_processes = excluded_processes
 
     def to_json(self):
         settings = {
@@ -56,6 +34,5 @@ class Setting:
 
     def read_json(self):
         json_reader = JsonTool(filename=self.filename)
-        json_reader.open_file()
         self.file_content_object = json_reader.get_json()
         self.parse()

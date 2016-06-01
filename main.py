@@ -1,4 +1,15 @@
 #!/usr/bin/python3
+"""
+    --------------------------------------------USAGE--------------------------------------------
+    -h --help                                              : prints this help page
+    -l <arg> --load <arg>                                  : load settings file from <arg>
+    -o <arg> --output <arg>                                : specify output filename
+    -i 'arg1 arg2 arg3' ... --include 'arg1 arg2 arg3' ... : set processes that should be tracked
+    -e 'arg1 arg2 arg3' ... --exclude 'arg1 arg2 arg3' ... : set processes that shouldn't be tracked
+    -b <arg>                                               : build settings file, based on current running processes
+                                                             --> excluded_processes
+    ---------------------------------------------------------------------------------------------
+"""
 from setting import Setting
 from process_tracker import ProcessTracker
 from settings_builder import SettingsBuilder
@@ -9,15 +20,7 @@ import time
 
 
 def show_help():
-    print("\n")
-    print("--------USAGE--------")
-    print("-h --help                                              : prints this help page")
-    print("-l <arg> --load <arg>                                  : load settings file from <arg>")
-    print("-o <arg> --output <arg>                                : specify output filename")
-    print("-i 'arg1 arg2 arg3' ... --include 'arg1 arg2 arg3' ... : set processes that should be tracked")
-    print("-e 'arg1 arg2 arg3' ... --exclude 'arg1 arg2 arg3' ... : set processes that shouldn't be tracked")
-    print("---------------------")
-    print("\n")
+    print(__doc__)
     sys.exit(0)
 
 
@@ -26,9 +29,9 @@ def get_settings_from_user():
     processes_to_track = input("processes to track: ")
     time_delay = input("time delay: ")
     save_location = input("log filename: ")
-    settings.set_processes_to_track(processes_to_track.split(' '))
-    settings.set_time_delay(int(time_delay))
-    settings.set_log_filename(save_location)
+    settings.processes_to_track = processes_to_track.split(' ')
+    settings.time_delay = int(time_delay)
+    settings.log_filename = save_location
     return settings
 
 
@@ -51,15 +54,15 @@ def main():
                 print(a)
             except:
                 print("settings file not found")
-                exit(1)
+                sys.exit(1)
         elif o in ("-o", "--output"):
-            settings.set_log_filename(a)
+            settings.log_filename = a
         elif o in ("-i", "--included"):
             processes_to_track = a.split(' ')
-            settings.set_processes_to_track(processes_to_track)
+            settings.processes_to_track = processes_to_track
         elif o in ("-e", "--excluded"):
             excluded_processes = a.split(' ')
-            settings.set_excluded_processes(excluded_processes)
+            settings.excluded_processes = excluded_processes
         elif o in ("-b", "--build"):
             settings_builder = SettingsBuilder()
             settings_builder.build_exclude_settings()
@@ -71,9 +74,9 @@ def main():
         else:
             assert False, "unhandled option"
 
-    print("time_delay=" + str(settings.get_time_delay()))
+    print("time_delay=" + str(settings.time_delay))
     process_tracker = ProcessTracker(settings)
-    thread = threading.Thread(target=process_tracker.start_logging, args=(settings.get_time_delay(), ))
+    thread = threading.Thread(target=process_tracker.start_logging, args=(settings.time_delay, ))
     """thread dies, if main dies"""
     thread.setDaemon(True)
     thread.start()
