@@ -1,6 +1,6 @@
 {
-  "processes_to_track": ["chrome","firefox", "thunderbird", "Telegram", "bash", "ssh", "corebird", "code", "java", "python"],
-  "time_delay": 2,
+  "processes_to_track": ["chrome","firefox", "thunderbird", "Telegram", "bash", "ssh", "corebird", "code", "java", "python", "atom"],
+  "time_delay": 1,
   "excluded_processes": [],
-  "log_filename" : "log.json"
+  "log_filename" : "coding.json"
 }

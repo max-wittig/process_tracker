@@ -27,10 +27,13 @@ class Setting:
         return settings
 
     def parse(self):
-        self.processes_to_track = self.file_content_object["processes_to_track"]
-        self.time_delay = self.file_content_object["time_delay"]
-        self.excluded_processes = self.file_content_object["excluded_processes"]
-        self.log_filename = self.file_content_object["log_filename"]
+        try:
+            self.processes_to_track = self.file_content_object["processes_to_track"]
+            self.time_delay = self.file_content_object["time_delay"]
+            self.excluded_processes = self.file_content_object["excluded_processes"]
+            self.log_filename = self.file_content_object["log_filename"]
+        except KeyError:
+            pass
 
     def read_json(self):
         json_reader = JsonTool(filename=self.filename)
