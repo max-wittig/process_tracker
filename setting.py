@@ -32,8 +32,8 @@ class Setting:
             self.time_delay = self.file_content_object["time_delay"]
             self.excluded_processes = self.file_content_object["excluded_processes"]
             self.log_filename = self.file_content_object["log_filename"]
-        except KeyError:
-            pass
+        except KeyError as e:
+            print(e)
 
     def read_json(self):
         json_reader = JsonTool(filename=self.filename)

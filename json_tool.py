@@ -11,12 +11,12 @@ class JsonTool:
         self.filename = filename
 
     def get_file_content(self):
-        with open(self.filename) as f:
-            return f
+        with open(self.filename, "r") as f:
+            return f.read()
 
     def get_json(self):
-        with open(self.filename) as f:
-            return json.load(f)
+        with open(self.filename, "r") as f:
+            return json.loads(f.read())
 
     def write_process_list_to_file(self, process_object_list):
         with open(self.filename, "w") as f:

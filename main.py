@@ -1,35 +1,37 @@
 #!/usr/bin/python3
-"""
-    --------------------------------------------USAGE--------------------------------------------
-    -h --help                                              : prints this help page
-    -l <arg> --load <arg>                                  : load settings file from <arg>
-    -o <arg> --output <arg>                                : specify output filename
-    -i 'arg1 arg2 arg3' ... --include 'arg1 arg2 arg3' ... : set processes that should be tracked
-    -e 'arg1 arg2 arg3' ... --exclude 'arg1 arg2 arg3' ... : set processes that shouldn't be tracked
-    -b <arg>                                               : build settings file, based on current running processes
-                                                             --> excluded_processes
-    ---------------------------------------------------------------------------------------------
-"""
+
 from setting import Setting
 from process_tracker import ProcessTracker
 from settings_builder import SettingsBuilder
+import argparse
 import threading
 import sys
-import getopt
 import time
+import json
 
-
-def show_help():
-    print(__doc__)
-    sys.exit(0)
+def get_args():
+    parser.add_argument("-l", "--load", help="Load settings file")
+    parser.add_argument("-o", "--output", help="Specify output filename")
+    parser.add_argument("-i", "--included", help="Set processes that should be tracked", nargs="+")
+    parser.add_argument("-e", "--excluded", help="Set processes that shouldn't be tracked", nargs="+")
+    parser.add_argument("-b", "--build", help="Build settings file, based on current running processes --> excluded_processes")
+    parser.add_argument("-m", "--manual", help="Manual input", action="store_true")
+    options = parser.parse_args()
+    return vars(options)
 
 
 def get_settings_from_user():
     settings = Setting()
-    processes_to_track = input("processes to track: ")
+    settings.processes_to_track = input("processes to track: ")
+    if settings.processes_to_track:
+        settings.processes_to_track = settings.processes_to_track.split(" ")
+    settings.excluded_processes = input("excluded processes: ")
+    if settings.excluded_processes:
+        settings.excluded_processes = settings.excluded_processes.split(" ")
     time_delay = input("time delay: ")
+    if not time_delay:
+        time_delay = 2
     save_location = input("log filename: ")
-    settings.processes_to_track = processes_to_track.split(' ')
     settings.time_delay = int(time_delay)
     settings.log_filename = save_location
     return settings
@@ -37,44 +39,34 @@ def get_settings_from_user():
 
 def main():
     settings = Setting()
-    try:
-        opts, args = getopt.getopt(sys.argv[1:], "hl:o:i:e:b:d",
-                                   ["help", "load=", "output=", "included=", "excluded=", "build=", "debug"])
-    except getopt.GetoptError as err:
-        # print help information and exit:
-        print(err)  # will print something like "option -a not recognized"
-        sys.exit(2)
-
-    for o, a in opts:
-        if o in ("-h", "--help"):
-            show_help()
-        elif o in ("-l", "--load"):
+    args = get_args()
+    if args["manual"]:
+        settings = get_settings_from_user()
+    else:
+        if args["load"]:
             try:
-                settings.load_from_file("settings/" + a)
-                print(a)
+                settings.load_from_file("settings/" + args["load"])
+                print("Settings loaded from {0}".format(args["load"]))
             except:
-                print("settings file not found")
-                sys.exit(1)
-        elif o in ("-o", "--output"):
-            settings.log_filename = a
-        elif o in ("-i", "--included"):
-            processes_to_track = a.split(' ')
-            settings.processes_to_track = processes_to_track
-        elif o in ("-e", "--excluded"):
-            excluded_processes = a.split(' ')
-            settings.excluded_processes = excluded_processes
-        elif o in ("-b", "--build"):
+                exit("Settings file {0} not found".format(args["load"]))
+        if args["output"]:
+            settings.log_filename = args["output"]
+        if args["included"]:
+            settings.processes_to_track = args["included"]
+            print(settings.processes_to_track)
+        if args["excluded"]:
+            settings.excluded_processes = args["excluded"]
+        if args["build"]:
             settings_builder = SettingsBuilder()
             settings_builder.build_exclude_settings()
-            settings_builder.save_settings("settings/" + a)
-            print("settings saved in " + a)
-            sys.exit(0)
-        elif o in ("-d", "--debug"):
-            settings = get_settings_from_user()
-        else:
-            assert False, "unhandled option"
+            settings_builder.save_settings("settings/" + args["build"])
+            print("Settings saved in " + args["build"])
+            exit(0)
 
-    print("time_delay=" + str(settings.time_delay))
+        print("time_delay=" + str(settings.time_delay))
+    if settings is None:
+        parser.print_help()
+        exit("Settings is None")
     process_tracker = ProcessTracker(settings)
     thread = threading.Thread(target=process_tracker.start_logging, args=(settings.time_delay, ))
     """thread dies, if main dies"""
@@ -88,5 +80,7 @@ def main():
     thread.join()
     process_tracker.write_process_list()
 
+
 if __name__ == '__main__':
+    parser = argparse.ArgumentParser("Process Tracker")
     main()
