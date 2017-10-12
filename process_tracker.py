@@ -1,4 +1,5 @@
 import psutil
+from psutil import NoSuchProcess
 import time
 from task import Task
 from process import Process
@@ -46,8 +47,11 @@ class ProcessTracker:
         return_process_list = []
         for process in psutil_process_list:
             if str(process.name()) not in return_process_list:
-                return_process_list.append(process.name())
-
+                try:
+                    process_name = str(process.name())
+                    return_process_list.append(process_name)
+                except NoSuchProcess:
+                    continue
         """excluded processes are priority"""
         if len(self.settings.excluded_processes) > 0:
             return self.user_exclude_filter_processes(return_process_list)
